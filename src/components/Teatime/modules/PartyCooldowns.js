@@ -16,6 +16,168 @@ import {ActorType} from 'fflogs'
 // 	{key: 'REPRISAL'},
 // ]
 
+// KC: This should only care about the CDs, not the buff / debuf durations
+// KC: Should SELF be the only group we really implement in this module?
+// KC: Better idea is:
+// for each job, they have:
+// 		RAID BUFFS - for offensive group buffs / enemy debuffs
+// 		RAID DEF - group defensive group buffs / enemy debuffs
+// 		SELF - personal cooldowns
+// Then each SourceID / Action ID pair would map to a group
+// 		RAID BUFFS - map to a shared group for the given action ID
+// 		RAID DEF - map to a shared group for the given action ID buff duration
+// 				 - Also shows up for the personal subgroup as a CD
+// 		SELF - Buffs are top level ? out of scope
+// 		     - CDs are subgrouped
+
+// KC: One for roles too? or just mix it in
+export const JOB_COOLDOWNS = {
+	[ActorType.PALADIN]: {
+		actions: [
+			// Global
+			ACTIONS.REPRISAL.id,
+			ACTIONS.DIVINE_VEIL.id,
+			ACTIONS.PASSAGE_OF_ARMS.id,
+			// Personal
+			ACTIONS.SENTINEL.id,
+			ACTIONS.RAMPART.id,
+			ACTIONS.COVER.id, // other
+			ACTIONS.INTERVENTION.id, // other
+			ACTIONS.SHELTRON.id, // useful?
+			ACTIONS.HALLOWED_GROUND.id,
+		],
+	},
+	[ActorType.WARRIOR]: {
+		actions: [
+			// Global
+			ACTIONS.SHAKE_IT_OFF.id,
+			ACTIONS.REPRISAL.id,
+			// Personal
+			ACTIONS.RAW_INTUITION.id,
+			ACTIONS.NASCENT_FLASH.id,
+			ACTIONS.VENGEANCE.id,
+			ACTIONS.THRILL_OF_BATTLE.id,
+			ACTIONS.EQUILIBRIUM.id,
+			ACTIONS.RAMPART.id,
+			ACTIONS.HOLMGANG.id,
+		],
+	},
+	[ActorType.DARK_KNIGHT]: {
+		actions: [
+			// Global
+			ACTIONS.DARK_MISSIONARY.id,
+			ACTIONS.REPRISAL.id,
+			// Personal
+			ACTIONS.THE_BLACKEST_NIGHT.id,
+			ACTIONS.SHADOW_WALL.id,
+			ACTIONS.DARK_MIND.id,
+			ACTIONS.RAMPART.id,
+			ACTIONS.LIVING_DEAD.id,
+		],
+	},
+	[ActorType.GUNBREAKER]: {
+		actions: [
+			// Global
+			ACTIONS.HEART_OF_LIGHT.id,
+			ACTIONS.REPRISAL.id,
+			// Personal
+			ACTIONS.CAMOUFLAGE.id,
+			ACTIONS.NEBULA.id,
+			ACTIONS.HEART_OF_STONE.id,
+			ACTIONS.RAMPART.id,
+			ACTIONS.SUPERBOLIDE.id,
+		],
+	},
+	[ActorType.WHITE_MAGE]: {
+		actions: [
+			// Global
+			ACTIONS.TEMPERANCE.id,
+			ACTIONS.ASYLUM.id,
+			ACTIONS.PLENARY_INDULGENCE.id,
+		],
+	},
+	[ActorType.SCHOLAR]: {
+		actions: [
+			// Global
+			ACTIONS.SACRED_SOIL.id,
+			ACTIONS.SCH_FEY_ILLUMINATION.id,
+			ACTIONS.FEY_ILLUMINATION.id,
+			ACTIONS.SERAPHIC_ILLUMINATION.id,
+		],
+	},
+	[ActorType.ASTROLOGIAN]: {
+		actions: [
+			// Global
+			ACTIONS.COLLECTIVE_UNCONSCIOUS.id,
+			ACTIONS.EARTHLY_STAR.id,
+		],
+	},
+	[ActorType.MONK]: {
+		actions: [
+			// Global
+			ACTIONS.MANTRA.id,
+			ACTIONS.FEINT.id,
+		],
+	},
+	[ActorType.DRAGOON]: {
+		actions: [
+			// Global
+			ACTIONS.FEINT.id,
+		],
+	},
+	[ActorType.NINJA]: {
+		actions: [
+			// Global
+			ACTIONS.FEINT.id,
+		],
+	},
+	[ActorType.SAMURAI]: {
+		actions: [
+			// Global
+			ACTIONS.FEINT.id,
+		],
+	},
+	[ActorType.BARD]: {
+		actions: [
+			// Global
+			ACTIONS.TROUBADOUR.id,
+			// Personal
+			ACTIONS.THE_WARDENS_PAEAN.id,
+		],
+	},
+	[ActorType.MACHINIST]: {
+		actions: [
+			// Global
+			ACTIONS.TACTICIAN.id,
+		],
+	},
+	[ActorType.DANCER]: {
+		actions: [
+			// Global
+			ACTIONS.SHIELD_SAMBA.id,
+			ACTIONS.IMPROVISATION.id,
+		],
+	},
+	[ActorType.BLACK_MAGE]: {
+		actions: [
+			// Global
+			ACTIONS.ADDLE.id,
+		],
+	},
+	[ActorType.SUMMONER]: {
+		actions: [
+			// Global
+			ACTIONS.ADDLE.id,
+		],
+	},
+	[ActorType.RED_MAGE]: {
+		actions: [
+			// Global
+			ACTIONS.ADDLE.id,
+		],
+	},
+}
+
 // Track the cooldowns on actions and shit for the whole party
 // KC: Need to do stuff for this to become a TS file
 export default class PartyCooldowns extends Module {
@@ -32,102 +194,6 @@ export default class PartyCooldowns extends Module {
 	// nested groups. Actions not specified here will be sorted by their ID below.
 	// Check the NIN and SMN modules for examples.
 
-	// KC: This should only care about the CDs, not the buff / debuf durations
-	// KC: Should SELF be the only group we really implement in this module?
-	// KC: Better idea is:
-	// for each job, they have:
-	// 		RAID BUFFS - for offensive group buffs / enemy debuffs
-	// 		RAID DEF - group defensive group buffs / enemy debuffs
-	// 		SELF - personal cooldowns
-	// Then each SourceID / Action ID pair would map to a group
-	// 		RAID BUFFS - map to a shared group for the given action ID
-	// 		RAID DEF - map to a shared group for the given action ID buff duration
-	// 				 - Also shows up for the personal subgroup as a CD
-	// 		SELF - Buffs are top level ? out of scope
-	// 		     - CDs are subgrouped
-
-	// KC: One for roles too? or just mix it in
-	static jobCooldowns = {
-		[ActorType.PALADIN]: {},
-		[ActorType.WARRIOR]: {
-			actions: [
-				// Global
-				ACTIONS.SHAKE_IT_OFF.id,
-				ACTIONS.REPRISAL.id,
-				// Personal
-				ACTIONS.RAW_INTUITION.id,
-				ACTIONS.NASCENT_FLASH.id,
-				ACTIONS.VENGEANCE.id,
-				ACTIONS.THRILL_OF_BATTLE.id,
-				ACTIONS.EQUILIBRIUM.id,
-				ACTIONS.RAMPART.id,
-				ACTIONS.HOLMGANG.id,
-			],
-		},
-		[ActorType.DARK_KNIGHT]: {
-			actions: [
-				// Global
-				ACTIONS.DARK_MISSIONARY.id,
-				ACTIONS.REPRISAL.id,
-				// Personal
-				ACTIONS.THE_BLACKEST_NIGHT.id,
-				ACTIONS.SHADOW_WALL.id,
-				ACTIONS.DARK_MIND.id,
-				ACTIONS.RAMPART.id,
-				ACTIONS.LIVING_DEAD.id,
-			],
-		},
-		[ActorType.GUNBREAKER]: {},
-		[ActorType.WHITE_MAGE]: {
-			actions: [
-				// Global
-				ACTIONS.TEMPERANCE.id,
-			],
-		},
-		[ActorType.SCHOLAR]: {
-			actions: [
-				// Global
-				ACTIONS.SACRED_SOIL.id,
-				ACTIONS.SCH_FEY_ILLUMINATION.id,
-				ACTIONS.FEY_ILLUMINATION.id,
-				ACTIONS.SERAPHIC_ILLUMINATION.id,
-			],
-		},
-		[ActorType.ASTROLOGIAN]: {},
-		[ActorType.MONK]: {},
-		[ActorType.DRAGOON]: {},
-		[ActorType.NINJA]: {
-			actions: [
-				// Global
-				ACTIONS.FEINT.id,
-			],
-		},
-		[ActorType.SAMURAI]: {
-			actions: [
-				// Global
-				ACTIONS.FEINT.id,
-			],
-		},
-		[ActorType.BARD]: {
-			actions: [
-				// Global
-				ACTIONS.TROUBADOUR.id,
-				// Personal
-				ACTIONS.THE_WARDENS_PAEAN.id,
-			],
-		},
-		[ActorType.MACHINIST]: {},
-		[ActorType.DANCER]: {},
-		[ActorType.BLACK_MAGE]: {},
-		[ActorType.SUMMONER]: {
-			actions: [
-				// Global
-				ACTIONS.ADDLE.id,
-			],
-		},
-		[ActorType.RED_MAGE]: {},
-	}
-
 	_cooldownGroups = {}
 
 	_currentActionMap = {}
@@ -140,7 +206,7 @@ export default class PartyCooldowns extends Module {
 		console.log(this.friendlies.playerFriendlies.map(friendly => friendly.name))
 		console.log(this.friendlies.playerFriendlies)
 
-		// TODO:
+		// KC:
 		// for each friendly
 		//   this.friendlies.playerFriendlies
 		// Figure out their job / role
@@ -149,8 +215,8 @@ export default class PartyCooldowns extends Module {
 		//   this.friendlies.playerFriendlies.map(player => player.id) == SourceId
 		// add shared stuff to the shared groups
 		// add common stuff to the common groups
-
-		this._buildPlayerGroups(this.friendlies.playerFriendlies, this.constructor.jobCooldowns)
+		const playerFriendlies = this.friendlies.playerFriendlies
+		this._buildPlayerGroups(playerFriendlies, JOB_COOLDOWNS)
 		// TODO: Get buffs to show up as top level merge for player
 
 		this._cooldownGroups = _.groupBy(this.data.actions, 'cooldownGroup')
@@ -159,35 +225,13 @@ export default class PartyCooldowns extends Module {
 		// KC: phasing this function out
 		// this._buildGroups(this.constructor.cooldownOrder)
 
-		// this.addHook('begincast', {by: 'player'}, this._onBeginCast)
-		// this.addHook('cast', {by: 'player'}, this._onCast)
-		// this.addHook('complete', this._onComplete)
-		// TODO: Duplicate work with AdditionalPartyEvents
-		const filter = {abilityId: [
-			this.data.actions.RAMPART.id,
-			this.data.actions.REPRISAL.id,
-			this.data.actions.FEINT.id,
-			this.data.actions.ADDLE.id,
-			this.data.actions.SHADOW_WALL.id,
-			this.data.actions.DARK_MIND.id,
-			this.data.actions.LIVING_DEAD.id,
-			this.data.actions.THE_BLACKEST_NIGHT.id,
-			this.data.actions.DARK_MISSIONARY.id,
-			this.data.actions.VENGEANCE.id,
-			this.data.actions.HOLMGANG.id,
-			this.data.actions.THRILL_OF_BATTLE.id,
-			this.data.actions.EQUILIBRIUM.id,
-			this.data.actions.RAW_INTUITION.id,
-			this.data.actions.NASCENT_FLASH.id,
-			this.data.actions.SHAKE_IT_OFF.id,
-			this.data.actions.SACRED_SOIL.id,
-			this.data.actions.SCH_FEY_ILLUMINATION.id,
-			this.data.actions.FEY_ILLUMINATION.id,
-			this.data.actions.SERAPHIC_ILLUMINATION.id,
-			this.data.actions.TEMPERANCE.id,
-			this.data.actions.TROUBADOUR.id,
-			this.data.actions.THE_WARDENS_PAEAN.id,
-		]}
+		// KC: Duplicate work with AdditionalPartyEvents
+		// KC: This will break when JOB_COOLDOWNS becomes more complicated
+		const playerActions = playerFriendlies.flatMap(player => (
+			JOB_COOLDOWNS[player.type].actions
+		))
+		const filter = {abilityId: playerActions}
+
 		this.addHook('begincast', filter, this._onBeginCast)
 		this.addHook('cast', filter, this._onCast)
 		this.addHook('complete', this._onComplete)
