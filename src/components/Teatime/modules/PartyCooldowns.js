@@ -4,6 +4,7 @@ import {ItemGroup, Item} from 'parser/core/modules/Timeline'
 import React from 'react'
 // import {RAID_BUFFS} from 'parser/core/modules/RaidBuffs'
 import ACTIONS from 'data/ACTIONS'
+import {ActorType} from 'fflogs'
 
 // // These will be in a different module if at all
 // // Buffs
@@ -23,70 +24,109 @@ export default class PartyCooldowns extends Module {
 		'data',
 		'timeline',
 		'additionalPartyEvents', // eslint-disable-line @xivanalysis/no-unused-dependencies
+		'friendlies',
 	]
 
 	// Array used to sort cooldowns in the timeline. Elements should be either IDs for
 	// top-level groups, or objects of the format {name: string, actions: array} for
 	// nested groups. Actions not specified here will be sorted by their ID below.
 	// Check the NIN and SMN modules for examples.
-	static cooldownOrder = [
-		{
-			name: 'RAID',
-			merge: false,
-			showNested: true,
+
+	// KC: This should only care about the CDs, not the buff / debuf durations
+	// KC: Should SELF be the only group we really implement in this module?
+	// KC: Better idea is:
+	// for each job, they have:
+	// 		RAID BUFFS - for offensive group buffs / enemy debuffs
+	// 		RAID DEF - group defensive group buffs / enemy debuffs
+	// 		SELF - personal cooldowns
+	// Then each SourceID / Action ID pair would map to a group
+	// 		RAID BUFFS - map to a shared group for the given action ID
+	// 		RAID DEF - map to a shared group for the given action ID buff duration
+	// 				 - Also shows up for the personal subgroup as a CD
+	// 		SELF - Buffs are top level ? out of scope
+	// 		     - CDs are subgrouped
+
+	// KC: One for roles too? or just mix it in
+	static jobCooldowns = {
+		[ActorType.PALADIN]: {},
+		[ActorType.WARRIOR]: {
 			actions: [
-				ACTIONS.FEINT.id,
-				ACTIONS.ADDLE.id,
-				ACTIONS.DARK_MISSIONARY.id,
+				// Global
 				ACTIONS.SHAKE_IT_OFF.id,
-				ACTIONS.TEMPERANCE.id,
-				ACTIONS.TROUBADOUR.id,
-			],
-		},
-		{
-			name: 'DRK',
-			merge: false,
-			showNested: true,
-			actions: [
-				ACTIONS.SHADOW_WALL.id,
-				ACTIONS.DARK_MIND.id,
-				ACTIONS.LIVING_DEAD.id,
-				ACTIONS.THE_BLACKEST_NIGHT.id,
-			],
-		},
-		{
-			name: 'WAR',
-			merge: false,
-			showNested: true,
-			actions: [
-				ACTIONS.VENGEANCE.id,
-				ACTIONS.HOLMGANG.id,
-				ACTIONS.THRILL_OF_BATTLE.id,
-				ACTIONS.EQUILIBRIUM.id,
+				ACTIONS.REPRISAL.id,
+				// Personal
 				ACTIONS.RAW_INTUITION.id,
 				ACTIONS.NASCENT_FLASH.id,
+				ACTIONS.VENGEANCE.id,
+				ACTIONS.THRILL_OF_BATTLE.id,
+				ACTIONS.EQUILIBRIUM.id,
+				ACTIONS.RAMPART.id,
+				ACTIONS.HOLMGANG.id,
 			],
 		},
-		{
-			name: 'SCH',
-			merge: false,
-			showNested: true,
+		[ActorType.DARK_KNIGHT]: {
 			actions: [
+				// Global
+				ACTIONS.DARK_MISSIONARY.id,
+				ACTIONS.REPRISAL.id,
+				// Personal
+				ACTIONS.THE_BLACKEST_NIGHT.id,
+				ACTIONS.SHADOW_WALL.id,
+				ACTIONS.DARK_MIND.id,
+				ACTIONS.RAMPART.id,
+				ACTIONS.LIVING_DEAD.id,
+			],
+		},
+		[ActorType.GUNBREAKER]: {},
+		[ActorType.WHITE_MAGE]: {
+			actions: [
+				// Global
+				ACTIONS.TEMPERANCE.id,
+			],
+		},
+		[ActorType.SCHOLAR]: {
+			actions: [
+				// Global
 				ACTIONS.SACRED_SOIL.id,
 				ACTIONS.SCH_FEY_ILLUMINATION.id,
 				ACTIONS.FEY_ILLUMINATION.id,
 				ACTIONS.SERAPHIC_ILLUMINATION.id,
 			],
 		},
-		{
-			name: 'BRD',
-			merge: false,
-			showNested: true,
+		[ActorType.ASTROLOGIAN]: {},
+		[ActorType.MONK]: {},
+		[ActorType.DRAGOON]: {},
+		[ActorType.NINJA]: {
 			actions: [
+				// Global
+				ACTIONS.FEINT.id,
+			],
+		},
+		[ActorType.SAMURAI]: {
+			actions: [
+				// Global
+				ACTIONS.FEINT.id,
+			],
+		},
+		[ActorType.BARD]: {
+			actions: [
+				// Global
+				ACTIONS.TROUBADOUR.id,
+				// Personal
 				ACTIONS.THE_WARDENS_PAEAN.id,
 			],
 		},
-	]
+		[ActorType.MACHINIST]: {},
+		[ActorType.DANCER]: {},
+		[ActorType.BLACK_MAGE]: {},
+		[ActorType.SUMMONER]: {
+			actions: [
+				// Global
+				ACTIONS.ADDLE.id,
+			],
+		},
+		[ActorType.RED_MAGE]: {},
+	}
 
 	_cooldownGroups = {}
 
@@ -96,11 +136,28 @@ export default class PartyCooldowns extends Module {
 
 	constructor(...args) {
 		super(...args)
+		console.log(args)
+		console.log(this.friendlies.playerFriendlies.map(friendly => friendly.name))
+		console.log(this.friendlies.playerFriendlies)
+
+		// TODO:
+		// for each friendly
+		//   this.friendlies.playerFriendlies
+		// Figure out their job / role
+		//   this.friendlies.playerFriendlies.map(player => player.role)
+		// make a group for them
+		//   this.friendlies.playerFriendlies.map(player => player.id) == SourceId
+		// add shared stuff to the shared groups
+		// add common stuff to the common groups
+
+		this._buildPlayerGroups(this.friendlies.playerFriendlies, this.constructor.jobCooldowns)
+		// TODO: Get buffs to show up as top level merge for player
 
 		this._cooldownGroups = _.groupBy(this.data.actions, 'cooldownGroup')
 
 		// Pre-build groups for actions explicitly set by subclasses
-		this._buildGroups(this.constructor.cooldownOrder)
+		// KC: phasing this function out
+		// this._buildGroups(this.constructor.cooldownOrder)
 
 		// this.addHook('begincast', {by: 'player'}, this._onBeginCast)
 		// this.addHook('cast', {by: 'player'}, this._onCast)
@@ -136,46 +193,81 @@ export default class PartyCooldowns extends Module {
 		this.addHook('complete', this._onComplete)
 	}
 
-	_buildGroups(groups) {
-		// If there's no groups, noop
-		if (!groups) { return }
+	_sourceActionId(sourceId, actionId) {
+		return `${sourceId}-${actionId}`
+	}
 
-		const ids = groups.map((data, i) => {
-			const order = -(groups.length - i)
+	_buildPlayerGroups(players, jobCooldowns) {
+		if (!players) { return }
 
-			// If it's just an action id, build a group for it and stop
-			if (typeof data === 'number') {
-				const action = this.data.getAction(data)
-				this._buildGroup({
-					id: data,
-					content: action && action.name,
-					order,
-				})
-				return data
-			}
-
-			// Build the base group
-			const group = this._buildGroup({
-				id: data.name,
-				content: data.name,
-				order,
+		const ids = players.map((player, i) => {
+			const playerOrder = -(players.length - i)
+			const playerGroup = this._buildGroup({
+				id: player.id,
+				content: player.name,
+				order: playerOrder,
 			})
+			const playerJobCooldowns = jobCooldowns[player.type]
 
-			if (data.merge) {
-				// If it's a merge group, we only need to register our group for each of the IDs
-				data.actions.forEach(id => {
-					this._groups[id] = group
-				})
-			} else {
-				// Otherwise, build nested groups for each action
-				group.nestedGroups = this._buildGroups(data.actions)
-			}
-
-			return data.name
+			playerGroup.nestedGroups = playerJobCooldowns.actions.map((data, i) => {
+				const order = -(playerJobCooldowns.actions.length - i)
+				// KC: Check if this should be personal or grouped
+				if (typeof data === 'number') {
+					const action = this.data.getAction(data)
+					const combinedId = this._sourceActionId(player.id, data)
+					this._buildGroup({
+						id: combinedId,
+						content: action && action.name,
+						order,
+					})
+					return combinedId
+				}
+			})
 		})
 
 		return ids
 	}
+
+	// _buildGroups(groups) {
+	// 	// If there's no groups, noop
+	// 	if (!groups) { return }
+
+	// 	const ids = groups.map((data, i) => {
+	// 		const order = -(groups.length - i)
+
+	// 		// If it's just an action id, build a group for it and stop
+	// 		if (typeof data === 'number') {
+	// 			const action = this.data.getAction(data)
+	// 			this._buildGroup({
+	// 				id: data,
+	// 				content: action && action.name,
+	// 				order,
+	// 			})
+	// 			return data
+	// 		}
+
+	// 		// Build the base group
+	// 		const group = this._buildGroup({
+	// 			id: data.name,
+	// 			content: data.name,
+	// 			order,
+	// 		})
+
+	// 		if (data.merge) {
+	// 			// If it's a merge group, we only need to register our group for each of the IDs
+	// 			data.actions.forEach(id => {
+	// 				this._groups[id] = group
+	// 			})
+	// 		} else {
+	// 			// Otherwise, build nested groups for each action
+	// 			group.nestedGroups = this._buildGroups(data.actions)
+	// 		}
+
+	// 		return data.name
+	// 	})
+
+	// 	return ids
+	// }
 
 	_buildGroup(opts) {
 		const group = new ItemGroup({visible: true, showNested: true, ...opts})
@@ -249,9 +341,11 @@ export default class PartyCooldowns extends Module {
 		}
 
 		// Ensure we've got a group for this item
-		if (!this._groups[actionId]) {
+		const groupKey = this._sourceActionId(sourceId, actionId)
+		if (!this._groups[groupKey]) {
+			// KC: Make a group for the source?
 			this._buildGroup({
-				id: actionId,
+				id: groupKey,
 				content: action.name,
 				order: actionId,
 			})
@@ -261,7 +355,7 @@ export default class PartyCooldowns extends Module {
 		cd.history
 			.forEach(use => {
 				if (!use.shared) {
-					this._groups[actionId].addItem(new Item({
+					this._groups[groupKey].addItem(new Item({
 						type: 'background',
 						start: use.timestamp - this.parser.fight.start_time,
 						length: use.length,
