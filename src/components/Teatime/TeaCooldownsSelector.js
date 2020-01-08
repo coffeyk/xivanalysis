@@ -23,12 +23,11 @@ export default class TeaCooldownsSelector extends Component {
 	// TODO: figure out a better way to determine column count
 	maxGridColumns = 16 // eslint-disable-line no-magic-numbers
 
-	state = {activeItem: undefined}
+	state = {activeItem: this.tankcds}
 
 	handleTabSwitch = (e, {name}) => {
 		this.setState({activeItem: name})
 
-		console.log(`Attempting to get cooldowns for ${name}`)
 		switch (name) {
 		case this.tankcds:
 			this.setState({activeContents: <div>{this.gridForRole(ROLES.TANK.id)}</div>})
@@ -114,6 +113,9 @@ export default class TeaCooldownsSelector extends Component {
 
 	render() {
 		const {activeItem, activeContents} = this.state
+		if (activeItem && !activeContents) {
+			this.handleTabSwitch(null, {name: activeItem})
+		}
 
 		const menu =
 			<Menu attached="top">
@@ -137,11 +139,15 @@ export default class TeaCooldownsSelector extends Component {
 				/>
 				<Menu.Menu position="right">
 					<Menu.Item>
-						<Input
-							transparent
-							icon={{name: 'search', link: 'true'}}
-							placeholder={<Trans id="tea.cooldownselect.searchplaceholder">Search cooldowns</Trans>}
-						/>
+						<Trans id="tea.cooldownselect.searchplaceholder" render={({translation}) => (
+							<Input
+								transparent
+								icon={{name: 'search', link: true}}
+								placeholder={translation}
+							/>
+						)}>
+							Search cooldowns
+						</Trans>
 					</Menu.Item>
 				</Menu.Menu>
 			</Menu>
