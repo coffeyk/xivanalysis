@@ -11,6 +11,7 @@ import {getDataBy} from 'data'
 // TODO: Add the ability to select cooldowns
 // TODO: Add a time input for the selected cooldown
 // TODO: Add a way to save stuff
+// TODO: Break out ui components into better class structure
 export default class TeaCooldownsSelector extends Component {
 	static propTypes = {}
 
