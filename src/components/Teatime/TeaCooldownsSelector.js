@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import React, {Component} from 'react'
 import {Modal, Menu, Input, Image, Segment, Grid} from 'semantic-ui-react'
 import styles from './Teatime.module.css'
@@ -57,25 +56,24 @@ export default class TeaCooldownsSelector extends Component {
 				return roleId.includes(this.roleIdForActorType(actorType))
 			})
 
-		const cooldownsForRole = [...new Set(jobsInRole.flatMap(job => {
+		const cooldownIdsForRole = [...new Set(jobsInRole.flatMap(job => {
 			return JOB_COOLDOWNS[job].actions
 		}))]
 
-		return this.gridForCooldowns(cooldownsForRole)
+		return this.gridForCooldowns(cooldownIdsForRole)
 	}
 
-	gridForCooldowns(cooldowns) {
-		if (!cooldowns) {
+	gridForCooldowns(cooldownIds) {
+		if (!cooldownIds) {
 			return <div>
 				ERROR: No cooldowns found for the desired role. <br/>
 				This probably means something was implemented wrong with respect to what the roles you can choose from are.
 			</div>
 		}
 
-		const columns = _.times(cooldowns.length, (i) => {
-			return <Grid.Column key={i}>
-				{console.log(`Creating grid column for cooldown ${cooldowns[i]} with name ${getDataBy(ACTIONS, 'id', cooldowns[i]).name}`)}
-				<TeaCooldownTimeForm cooldownId={cooldowns[i]}/>
+		const columns = cooldownIds.map((cooldownId) => {
+			return <Grid.Column key={cooldownId}>
+				<TeaCooldownTimeForm cooldownId={cooldownId}/>
 			</Grid.Column>
 		})
 
@@ -206,7 +204,6 @@ export class TeaCooldownTimeForm extends Component {
 
 	handleSubmit(event) {
 		// Store the usage
-		console.log(`Storing usage between ${this.state.startTime} and ${this.state.endTime}`)
 		this.setState({
 			usages: this.sortTimes(this.state.usages.concat({start: this.state.startTime, end: this.state.endTime})),
 		})
@@ -236,7 +233,6 @@ export class TeaCooldownTimeForm extends Component {
 						if (usages.length > 0) {
 							return <ul className={styles.cduselist}>
 								{usages.map((usage, i) => {
-									console.log(usage)
 									return <li key={i}>
 										Between <b>{usage.start}</b> and <b>{usage.end}</b>
 										<button type="button" onClick={this.deleteUsage} value={i}>X</button>
