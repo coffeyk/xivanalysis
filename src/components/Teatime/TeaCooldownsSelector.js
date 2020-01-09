@@ -222,28 +222,27 @@ export class TeaCooldownTimeForm extends Component {
 	}
 
 	render() {
+		const {usages} = this.state
+
 		return <div>
 			<Image src={this.cooldown.icon}/>
 
-			{(() => {
-				const {usages} = this.state
-				return <div>
-					<p><b>{this.cooldown.name} timings:</b></p>
-					{(() => {
-						if (usages.length > 0) {
-							return <ul className={styles.cduselist}>
-								{usages.map((usage, i) => {
-									return <li key={i}>
-										Between <b>{usage.start}</b> and <b>{usage.end}</b>
-										<button type="button" onClick={this.deleteUsage} value={i}>X</button>
-									</li>
-								})}
-							</ul>
-						}
-						return 'N/A'
-					})()}
-				</div>
-			})()}
+			<div>
+				<p><b>{this.cooldown.name} timings:</b></p>
+				{(() => {
+					if (usages.length > 0) {
+						return <ul className={styles.cduselist}>
+							{usages.map((usage, i) => {
+								return <li key={i}>
+									Between <b>{usage.start}</b> and <b>{usage.end}</b>
+									<button type="button" onClick={this.deleteUsage} value={i}>X</button>
+								</li>
+							})}
+						</ul>
+					}
+					return 'N/A'
+				})()}
+			</div>
 
 			<form onSubmit={this.handleSubmit} placeholder={this.startPlaceholder}>
 				<input
