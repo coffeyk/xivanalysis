@@ -36,14 +36,20 @@ export default class EnemyAttacks extends Module {
 		// 	visible: true,
 		// })
 		// this.timeline.addGroup(group)
-
+		const ABILITY_NAMES: {[key: number]: string} = {
+			18808 : 'Auto Attack', // LL
+			18809 : 'Auto Attack', // HAND
+		}
+		const halfSecond = 500
 		for (const event of this.damageEvents) {
+			const abilityName = event.ability.name || ABILITY_NAMES[event.ability.guid] || `${event.ability.guid}`
 			this.timeline.addItem(new Item({
-				type: 'background',
+				type: 'point',
+				group: event.targetID,
 				style: 'background-color: #ce909085;',
 				start: event.timestamp - startTime,
-				end: event.timestamp - startTime + 1,
-				// content: `${event.ability.guid}`,
+				end: event.timestamp - startTime + halfSecond,
+				title: abilityName,
 			}))
 		}
 	}
