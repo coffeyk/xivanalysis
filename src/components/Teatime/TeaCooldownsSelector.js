@@ -244,7 +244,7 @@ export class TeaCooldownTimeForm extends Component {
 				})()}
 			</div>
 
-			<form onSubmit={this.handleSubmit} placeholder={this.startPlaceholder}>
+			<form onSubmit={this.handleSubmit}>
 				<input
 					type="text"
 					required="required"
