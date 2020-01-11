@@ -15,6 +15,7 @@ const buildQueryFilter = (data, playerActions) => [
 			data.statuses.CHAIN_STRATAGEM.id,
 			data.statuses.RUINATION.id,
 			data.statuses.ADDLE.id,
+			data.statuses.FEINT.id,
 		],
 		targetsOnly: true,
 	}, {
