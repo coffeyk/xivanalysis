@@ -8,6 +8,7 @@ import Timeline, {Item, ItemGroup} from 'parser/core/modules/Timeline'
 import React from 'react'
 import {Table} from 'semantic-ui-react'
 import {formatDuration} from 'utilities'
+import DISPLAY_ORDER from './DISPLAY_ORDER'
 import MultiStatuses from './multi/MultiStatuses'
 
 // Enemy attacks
@@ -20,7 +21,7 @@ import MultiStatuses from './multi/MultiStatuses'
 
 export default class EnemyAttacks extends Module {
 	static handle = 'enemyAttacks'
-	static displayOrder = 50
+	static displayOrder = DISPLAY_ORDER.ENEMY_ATTACKS
 	static displayMode = DISPLAY_MODE.FULL
 	static title = t('teatime.enemyattacks.title')`Enemy Attacks`
 
