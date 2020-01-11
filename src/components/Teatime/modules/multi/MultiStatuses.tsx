@@ -28,7 +28,6 @@ interface EntityStatuses {
 
 export default class MultiStatuses extends Module {
 	static handle = 'multiStatuses'
-	static debug = true
 
 	@dependency private data!: Data
 	@dependency private enemies!: Enemies
@@ -63,10 +62,8 @@ export default class MultiStatuses extends Module {
 	}
 
 	private onComplete() {
-		// Do something with all these buffs?
-		const entityStatus = this.entityStatuses[38]
-		const statusEntry = entityStatus.statusUsage[1001220]
-		this.debug(statusEntry)
+		// KC: Do something with all these buffs?
+		return false
 	}
 
 	private onApply(event: BuffEvent) {
@@ -90,6 +87,7 @@ export default class MultiStatuses extends Module {
 		if (this.isStatusAppliedToPet(event)) {
 			return
 		}
+
 		this.endPrevStatus(event)
 	}
 
@@ -164,10 +162,6 @@ export default class MultiStatuses extends Module {
 			const statusEntry = entityStatus.statusUsage[status.id]
 			if (statusEntry) {
 				const prev = statusEntry.usages[statusEntry.usages.length - 1]
-				// if (event.ability.guid === 1001220) {
-				// 	this.debug(event)
-				// 	this.debug(prev)
-				// }
 				if (!prev.end) {
 					prev.end = event
 				}
