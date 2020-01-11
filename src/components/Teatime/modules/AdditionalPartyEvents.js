@@ -99,7 +99,7 @@ export default class AdditionalPartyEvents extends Module {
 			this.parser.player.guid,
 			...this.parser.player.pets.map(pet => pet.guid),
 		].join(',')
-		filter =  `(${filter}) and source.id not in (${playerIds})`
+		filter =  `(${filter}) and source.id not in (${playerIds}) and target.id not in (${playerIds})`
 
 		// Request the new events
 		const newEvents = await getFflogsEvents(
