@@ -70,6 +70,7 @@ export const SCH = ensureStatuses({
 		id: 1874,
 		name: 'Angel\'s Whisper',
 		icon: 'https://xivapi.com/i/012000/012846.png',
+		duration: 21,
 	},
 
 	FEY_UNION: {
