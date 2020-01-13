@@ -131,8 +131,11 @@ export default class EnemyAttacks extends Module {
 
 	private damageCell(damageEvent: DamageEvent): React.ReactNode {
 		this.debug(damageEvent)
-
-		return <NumberFormat value={damageEvent.amount} />
+		const numberEvent = <NumberFormat value={damageEvent.amount} />
+		if (damageEvent.overkill) {
+			return <strong>*{numberEvent}</strong>
+		}
+		return numberEvent
 	}
 
 	private attackRow(damageEvent: DamageEvent, index: number): React.ReactNode {
