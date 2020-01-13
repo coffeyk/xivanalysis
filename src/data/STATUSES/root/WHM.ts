@@ -18,7 +18,7 @@ export const WHM = ensureStatuses({
 	CONFESSION: {
 		id: 1219,
 		name: 'Confession',
-		icon: 'https://xivapi.com/i/018000/018901.png',
+		icon: 'https://xivapi.com/i/012000/012637.png',
 		duration: 10,
 	},
 
@@ -62,7 +62,7 @@ export const WHM = ensureStatuses({
 	},
 
 	ASYLUM: {
-		id: 739,
+		id: 1912,
 		name: 'Asylum',
 		icon: 'https://xivapi.com/i/012000/012629.png',
 		duration: 24,

@@ -80,6 +80,7 @@ export const SCH = ensureActions({
 		name: 'Sacred Soil',
 		icon: 'https://xivapi.com/i/002000/002804.png',
 		cooldown: 30,
+		statusesApplied: ['SACARED_SOIL'],
 	},
 
 	LUSTRATE: {
@@ -177,7 +178,7 @@ export const SCH = ensureActions({
 		name: 'Whispering Dawn',
 		icon: 'https://xivapi.com/i/002000/002827.png',
 		cooldown: 60,
-		statusesApplied: ['WHISPERING_DAWN'],
+		statusesApplied: ['WHISPERING_DAWN', 'ANGELS_WHISPER'],
 	},
 
 	SCH_FEY_ILLUMINATION: {

@@ -36,6 +36,12 @@ export const SCH = ensureStatuses({
 		duration: 15,
 	},
 
+	SACARED_SOIL: {
+		id: 299,
+		name: 'Sacred Soil',
+		icon: 'https://xivapi.com/i/012000/012802.png',
+	},
+
 	DISSIPATION: {
 		id: 791,
 		name: 'Dissipation',
@@ -60,6 +66,11 @@ export const SCH = ensureStatuses({
 	// -----
 	// PET
 	// -----
+	ANGELS_WHISPER: {
+		id: 1874,
+		name: 'Angel\'s Whisper',
+		icon: 'https://xivapi.com/i/012000/012846.png',
+	},
 
 	FEY_UNION: {
 		id: 1223,
