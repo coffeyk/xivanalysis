@@ -78,6 +78,13 @@ export const SCH = ensureStatuses({
 		icon: 'https://xivapi.com/i/012000/012811.png',
 	},
 
+	SERAPHIC_VEIL: {
+		id: 1917,
+		name: 'Seraphic Veil',
+		icon: 'https://xivapi.com/i/012000/012848.png',
+		duration: 30,
+	},
+
 	WHISPERING_DAWN: {
 		id: 315,
 		name: 'Whispering Dawn',
