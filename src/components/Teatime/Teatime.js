@@ -13,9 +13,9 @@ import React, {Component} from 'react'
 import {Header, Loader} from 'semantic-ui-react'
 import {StoreContext} from 'store'
 import styles from './Teatime.module.css'
-import ResultSegment from './ResultSegment'
-import SegmentLinkItem from './SegmentLinkItem'
-import {SegmentPositionProvider} from './SegmentPositionContext'
+import ResultSegment from '../Analyse/ResultSegment'
+import SegmentLinkItem from '../Analyse/SegmentLinkItem'
+import {SegmentPositionProvider} from '../Analyse/SegmentPositionContext'
 
 @observer
 class Teatime extends Component {

@@ -8,22 +8,29 @@ import {JOB_COOLDOWNS} from './PartyCooldowns'
 
 const buildQueryFilter = (data, playerActions) => [
 	// Player-applied debuffs that don't get pulled when checking by actor
+	// {
+	// 	types: ['applydebuff', 'removedebuff'],
+	// 	abilities: [
+	// 		data.statuses.TRICK_ATTACK_VULNERABILITY_UP.id,
+	// 		data.statuses.CHAIN_STRATAGEM.id,
+	// 		data.statuses.RUINATION.id,
+	// 		data.statuses.ADDLE.id,
+	// 		data.statuses.FEINT.id,
+	// 	],
+	// 	targetsOnly: true,
+	// },
 	{
-		types: ['applydebuff', 'removedebuff'],
-		abilities: [
-			data.statuses.TRICK_ATTACK_VULNERABILITY_UP.id,
-			data.statuses.CHAIN_STRATAGEM.id,
-			data.statuses.RUINATION.id,
-			data.statuses.ADDLE.id,
-			data.statuses.FEINT.id,
-		],
-		targetsOnly: true,
-	}, {
 		types: ['begincast', 'cast'],
 		abilities: playerActions,
 		targetsOnly: false,
 	}, {
 		types: ['damage'], // This is probably double grabbing damage for one player
+	}, {
+		types: [
+			'applybuff', 'applydebuff',
+			'refreshdebuff', 'refreshbuff',
+			'removebuff', 'removedebuff',
+		],
 	},
 ]
 
