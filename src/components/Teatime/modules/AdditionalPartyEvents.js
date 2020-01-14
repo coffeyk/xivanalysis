@@ -7,7 +7,7 @@ import {isDefined} from 'utilities'
 import {JOB_COOLDOWNS} from './PartyCooldowns'
 
 const buildQueryFilter = (data, playerActions) => {
-	const defensiveStatusIds = new Set()
+	const actionStatusIds = new Set()
 	// Filter to only defensive statuses
 	playerActions.forEach(actionId => {
 		const action = data.getAction(actionId)
@@ -15,7 +15,7 @@ const buildQueryFilter = (data, playerActions) => {
 			action.statusesApplied.forEach(statusKey => {
 				const status = data.statuses[statusKey]
 				if (status) {
-					defensiveStatusIds.add(status.id)
+					actionStatusIds.add(status.id)
 				}
 			})
 		}
@@ -34,7 +34,7 @@ const buildQueryFilter = (data, playerActions) => {
 				'refreshdebuff', 'refreshbuff',
 				'removebuff', 'removedebuff',
 			],
-			abilities: Array.from(defensiveStatusIds),
+			abilities: Array.from(actionStatusIds),
 		},
 	]
 }

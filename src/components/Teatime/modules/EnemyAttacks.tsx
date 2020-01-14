@@ -146,7 +146,9 @@ export default class EnemyAttacks extends Module {
 		if (!entity) {
 			return
 		}
-
+		// KC: These status are what was active when damage went out
+		// For many defensive statuses, what matters is what was applied when damage
+		// was calculated. Can see this from the 'prepairs' event?
 		const sourceStatuses = this.multiStatuses.getStatuses(entity.id, damageEvent.timestamp).filter(status => (
 			this.defensiveStatusIds.has(status.id)
 		))
