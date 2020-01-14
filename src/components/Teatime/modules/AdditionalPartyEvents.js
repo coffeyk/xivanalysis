@@ -6,33 +6,38 @@ import Module from 'parser/core/Module'
 import {isDefined} from 'utilities'
 import {JOB_COOLDOWNS} from './PartyCooldowns'
 
-const buildQueryFilter = (data, playerActions) => [
-	// Player-applied debuffs that don't get pulled when checking by actor
-	// {
-	// 	types: ['applydebuff', 'removedebuff'],
-	// 	abilities: [
-	// 		data.statuses.TRICK_ATTACK_VULNERABILITY_UP.id,
-	// 		data.statuses.CHAIN_STRATAGEM.id,
-	// 		data.statuses.RUINATION.id,
-	// 		data.statuses.ADDLE.id,
-	// 		data.statuses.FEINT.id,
-	// 	],
-	// 	targetsOnly: true,
-	// },
-	{
-		types: ['begincast', 'cast'],
-		abilities: playerActions,
-		targetsOnly: false,
-	}, {
-		types: ['damage'], // This is probably double grabbing damage for one player
-	}, {
-		types: [
-			'applybuff', 'applydebuff',
-			'refreshdebuff', 'refreshbuff',
-			'removebuff', 'removedebuff',
-		],
-	},
-]
+const buildQueryFilter = (data, playerActions) => {
+	const defensiveStatusIds = new Set()
+	// Filter to only defensive statuses
+	playerActions.forEach(actionId => {
+		const action = data.getAction(actionId)
+		if (action && action.statusesApplied) {
+			action.statusesApplied.forEach(statusKey => {
+				const status = data.statuses[statusKey]
+				if (status) {
+					defensiveStatusIds.add(status.id)
+				}
+			})
+		}
+	})
+
+	return [
+		{
+			types: ['begincast', 'cast'],
+			abilities: playerActions,
+			targetsOnly: false,
+		}, {
+			types: ['damage'],
+		}, {
+			types: [
+				'applybuff', 'applydebuff',
+				'refreshdebuff', 'refreshbuff',
+				'removebuff', 'removedebuff',
+			],
+			abilities: Array.from(defensiveStatusIds),
+		},
+	]
+}
 
 const EVENT_TYPE_ORDER = {
 	death: -4,
