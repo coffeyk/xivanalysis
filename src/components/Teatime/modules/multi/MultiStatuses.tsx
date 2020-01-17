@@ -134,12 +134,12 @@ export default class MultiStatuses extends Module {
 		}
 
 		// KC: Original has a check for minimum status time before pushing to usages?
-		if (statusEntry.usages.some(buffPairs => {
-			const diff = Math.abs(event.timestamp - buffPairs.start.timestamp)
-			return diff <= STATUS_APPLY_ON_PARTY_THRESHOLD_MILLISECONDS
-		})) {
-			return
-		}
+		// if (statusEntry.usages.some(buffPairs => {
+		// 	const diff = Math.abs(event.timestamp - buffPairs.start.timestamp)
+		// 	return diff <= STATUS_APPLY_ON_PARTY_THRESHOLD_MILLISECONDS
+		// })) {
+		// 	return
+		// }
 
 		statusEntry.usages.push({
 			start: event,
