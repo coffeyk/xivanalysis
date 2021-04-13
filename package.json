@@ -73,7 +73,7 @@
     "toposort": "^2",
     "tslib": "^1.9.3",
     "url-search-params-polyfill": "^7",
-    "vis-timeline": "^5.1.0",
+    "vis-timeline": "^7.4.4",
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
